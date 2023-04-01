@@ -1,0 +1,33 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress-srv
+  annotations: 
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/use-regex: "true"
+spec:
+  rules:
+  - host: studenthub.com
+    http:
+      paths:
+      - pathType: Prefix
+        path: "/api/users/?(.*)"
+        backend:
+          service:
+            name: auth-srv
+            port: 
+              number: 3000
+      - pathType: Prefix
+        path: "/api/booki/?(.*)"
+        backend:
+          service:
+            name: book-srv
+            port: 
+              number: 3001
+      - pathType: Prefix
+        path: "/api/comment/?(.*)"
+        backend:
+          service:
+            name: comment-srv
+            port: 
+              number: 3002

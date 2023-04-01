@@ -1,0 +1,37 @@
+apiVersion: skaffold/v3alpha1
+kind: Config
+deploy:
+  kubectl:
+    {}
+manifests:
+  rawYaml:
+    - ./infra/k8s/*
+build:
+  local:
+    push: false
+  artifacts:
+    - image: emirnubi/auth
+      context: Auth
+      docker:
+        dockerfile: Dockerfile
+      sync:
+        manual:
+          - dest: .
+            src: 'src/**/*.ts'
+    - image: emirnubi/book
+      context: Book-SRV
+      docker:
+        dockerfile: Dockerfile
+      sync:
+        manual:
+          - dest: .
+            src: 'src/**/*.ts'
+    - image: emirnubi/comment
+      context: Comments-SRV
+      docker:
+        dockerfile: Dockerfile
+      sync:
+        manual:
+          - dest: .
+            src: 'src/**/*.ts'
+  
