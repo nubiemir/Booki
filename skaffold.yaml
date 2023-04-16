@@ -34,4 +34,20 @@ build:
         manual:
           - dest: .
             src: 'src/**/*.ts'
+    - image: emirnubi/query
+      context: Query-SRV
+      docker:
+        dockerfile: Dockerfile
+      sync:
+        manual:
+          - dest: .
+            src: 'src/**/*.ts'
+    - image: emirnubi/exchange
+      context: Exchange-SRV
+      docker:
+        dockerfile: Dockerfile
+      sync:
+        manual:
+          - dest: .
+            src: 'src/**/*.ts'
   

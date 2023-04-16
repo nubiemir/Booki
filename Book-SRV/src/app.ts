@@ -1,20 +1,12 @@
-import express, { ErrorRequestHandler } from "express";
+import express from "express";
 import cors from "cors";
 import {
   NotFoundError,
   errorHandler,
   currentUserMiddleware,
-} from "@hthub/common";
+} from "@booki/common";
 import cookieSession from "cookie-session";
-import {
-  newBook,
-  getBook,
-  ViewBooks,
-  deleteBook,
-  bookiHome,
-  UpdateBook,
-} from "./routes/app";
-import { newUser } from "./routes/demo/user";
+import { newBook, deleteBook, UpdateBook } from "./routes/app";
 
 const app = express();
 
@@ -27,11 +19,7 @@ app.use(
   })
 );
 app.use(currentUserMiddleware);
-app.use(newUser);
-app.use(bookiHome);
 app.use(newBook);
-app.use(ViewBooks);
-app.use(getBook);
 app.use(deleteBook);
 app.use(UpdateBook);
 

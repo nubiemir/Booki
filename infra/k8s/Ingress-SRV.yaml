@@ -31,3 +31,17 @@ spec:
             name: comment-srv
             port: 
               number: 3002
+      - pathType: Prefix
+        path: "/api/query/?(.*)"
+        backend:
+          service:
+            name: query-srv
+            port: 
+              number: 3003
+      - pathType: Prefix
+        path: "/api/bid/?(.*)"
+        backend:
+          service:
+            name: exchange-srv
+            port: 
+              number: 3004

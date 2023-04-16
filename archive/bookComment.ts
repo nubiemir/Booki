@@ -1,6 +1,6 @@
-import { isAuth } from "@hthub/common";
+import { isAuth } from "@booki/common";
 import express, { Request, Response } from "express";
-import { Comment } from "../models/comment";
+import { Comment } from "../Comments-SRV/src/models/comment";
 
 const router = express.Router();
 

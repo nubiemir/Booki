@@ -1,0 +1,10 @@
+import { User } from "./IUser";
+import { Subjects } from "./types/Subjects";
+
+export interface IUserCreatedPublisher extends User {
+  subject: Subjects.PUSERCREATED;
+}
+
+export interface IUserCreatedListener extends User {
+  subject: Subjects.SUSERCREATED;
+}

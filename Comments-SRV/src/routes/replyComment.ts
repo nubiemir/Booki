@@ -1,8 +1,16 @@
-import { isAuth, NotFoundError, validateRequest } from "@hthub/common";
-import express, { Request, Response } from "express";
+import {
+  BadRequestError,
+  isAuth,
+  NotFoundError,
+  validateRequest,
+} from "@booki/common";
+import express, { NextFunction, Request, Response } from "express";
 import { body } from "express-validator";
+import mongoose from "mongoose";
+import { ReplyCreatedPublisher } from "../events/publisher/replyCreatedPublisher";
 import { Comment } from "../models/comment";
 import { Reply } from "../models/reply";
+import { nats } from "../NatsWrapper";
 
 const router = express.Router();
 
@@ -11,20 +19,33 @@ router.put(
   [body("text").not().isEmpty(), body("commentId").not().isEmpty()],
   isAuth,
   validateRequest,
-  async (req: Request, res: Response) => {
-    const { text, commentId } = req.body;
-    const newReply = Reply.build({
-      text: text,
-      userId: "6424dd58ddda245fa5149cfb",
-    });
-    const comment = await Comment.findById(commentId);
-    if (!comment) throw new NotFoundError();
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { text, commentId } = req.body;
+      if (!mongoose.isValidObjectId(commentId))
+        throw new BadRequestError("Invalid commment Id");
+      const comment = await Comment.findById(commentId);
+      if (!comment) throw new BadRequestError("No comment found");
+      const newReply = Reply.build({
+        text: text,
+        userId: req.currentUser!.id.toString(),
+      });
 
-    comment.reply = [...comment.reply, newReply];
+      comment.reply = [...comment.reply, newReply];
 
-    await comment.save();
-
-    res.send(comment);
+      await comment.save();
+      await newReply.save();
+      new ReplyCreatedPublisher(nats.client).publish({
+        id: newReply.id,
+        userId: newReply.userId,
+        text: newReply.text,
+        commentId: comment.id,
+        likes: 0,
+      });
+      res.send(newReply);
+    } catch (error) {
+      return next(error);
+    }
   }
 );
 

@@ -4,7 +4,7 @@ import {
   currentUserMiddleware,
   NotFoundError,
   validateRequest,
-} from "@hthub/common";
+} from "@booki/common";
 import { User } from "../model/user";
 import { randomInt } from "node:crypto";
 
@@ -12,17 +12,19 @@ const router = express.Router();
 
 router.post(
   "/api/users/verify",
-  body("verification").not().isEmpty(),
+  body("verification")
+    .not()
+    .isEmpty()
+    .withMessage("Please provide verification number"),
   validateRequest,
   currentUserMiddleware,
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { verification } = req.body;
       const user = await User.findById(req.currentUser?.id);
-      if (!user) throw new NotFoundError();
-      console.log(user);
-      console.log(user?.verficationNumber);
-      if (verification !== user.verficationNumber)
+      if (!user) throw new Error("User not found");
+
+      if (verification !== user.verificationNumber)
         // verification does not match
         throw new Error("Verification Number does not much");
       if (user.expiresAt < new Date()) {
@@ -43,13 +45,13 @@ router.post(
       }
 
       // user verified
-      user.isVerfified = true;
+      user.set({ isVerified: true });
       await user.save();
 
       // login in again
       req.session = null;
 
-      res.status(201).json("success");
+      res.status(201).json("Verfied");
     } catch (error) {
       next(error);
     }

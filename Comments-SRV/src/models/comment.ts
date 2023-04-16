@@ -51,7 +51,12 @@ const CommentsSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    reply: [ReplySchema],
+    reply: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Reply",
+      },
+    ],
     likes: {
       type: Number,
       default: 0,

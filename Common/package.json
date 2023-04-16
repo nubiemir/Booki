@@ -1,10 +1,15 @@
 {
-  "name": "common",
-  "version": "1.0.0",
+  "name": "@booki/common",
+  "version": "0.0.21",
   "description": "",
-  "main": "index.js",
+  "main": "./build/index.js",
+  "types": "./build/index.d.ts",
+  "files": [
+    "./build/**/*"
+  ],
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "tsc",
+    "pub": "git add . && git commit -m \"updates\" && npm version patch && npm run build && npm publish"
   },
   "keywords": [],
   "author": "",
@@ -17,6 +22,11 @@
     "express": "^4.18.2",
     "express-validator": "^6.15.0",
     "jsonwebtoken": "^9.0.0",
+    "mongoose": "^7.0.3",
     "nats": "^2.12.1"
+  },
+  "devDependencies": {
+    "del-cli": "^5.0.0",
+    "typescript": "^5.0.2"
   }
 }

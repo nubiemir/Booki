@@ -1,13 +1,15 @@
 import mongoose from "mongoose";
 import { PasswordManager } from "../utils/passwordManager";
+import { updateIfCurrentPlugin } from "mongoose-update-if-current";
 
 // An interface that describes
 // properties required to create user
 interface IUser {
   email: string;
   password: string;
-  verficationNumber: number;
+  verificationNumber: string;
   expiresAt: Date;
+  userName: string;
 }
 
 // an interface that describes
@@ -22,9 +24,10 @@ interface IModel extends mongoose.Model<IDocument> {
 interface IDocument extends mongoose.Document {
   email: string;
   password: string;
-  verficationNumber: number;
+  verificationNumber: string;
   expiresAt: Date;
-  isVerfified: boolean;
+  userName: string;
+  isVerified: boolean;
 }
 
 const userSchema = new mongoose.Schema(
@@ -38,12 +41,16 @@ const userSchema = new mongoose.Schema(
       required: true,
     },
     verificationNumber: {
-      type: Number,
+      type: String,
+      required: true,
+    },
+    userName: {
+      type: String,
+      required: true,
     },
     isVerified: {
       type: Boolean,
-      required: true,
-      default: true,
+      default: false,
     },
     expiresAt: {
       type: mongoose.Schema.Types.Date,
@@ -61,6 +68,9 @@ const userSchema = new mongoose.Schema(
     },
   }
 );
+
+userSchema.set("versionKey", "version");
+userSchema.plugin(updateIfCurrentPlugin);
 
 userSchema.statics.build = (usr: IUser) => {
   return new User(usr);

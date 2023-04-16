@@ -1,5 +1,5 @@
 import { NatsConnection, StringCodec, JetStreamManager } from "nats";
-import { Subjects } from "./subjects";
+import { Subjects } from "./types/Subjects";
 
 interface Event {
   subject: Subjects;
@@ -13,14 +13,6 @@ export abstract class Publisher<T extends Event> {
 
   constructor(client: NatsConnection) {
     this.client = client;
-  }
-
-  async addStream(
-    jsm: JetStreamManager,
-    streamName: string,
-    subjects: string[]
-  ) {
-    await jsm.streams.add({ name: streamName, subjects });
   }
 
   publish(data: T["data"]): Promise<void> {

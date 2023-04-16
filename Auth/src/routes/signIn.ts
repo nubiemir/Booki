@@ -8,7 +8,7 @@ import {
   EmailVerificationError,
   isVerified,
   validateRequest,
-} from "@hthub/common";
+} from "@booki/common";
 
 const router = express.Router();
 
@@ -37,6 +37,8 @@ router.post(
       );
       if (!passwordMatched) throw new BadRequestError("Invalid Credentials");
 
+      // if (!existingUser.isVerified) throw new EmailVerificationError();
+
       // Generate jwt token
       const jwtToken = jsonwebtoken.sign(
         {
@@ -46,7 +48,7 @@ router.post(
         process.env.JWT_KEY!
       );
       req.session = { jwt: jwtToken };
-      res.status(200).json(existingUser);
+      res.status(200).json(jwtToken);
     } catch (error) {
       return next(error);
     }

@@ -1,16 +1,22 @@
-import mongoose from "mongoose";
+import mongoose, { ObjectId } from "mongoose";
+import { updateIfCurrentPlugin } from "mongoose-update-if-current";
 import { ExchangeStatus } from "../../Subjects/subjects";
+import { BookDoc } from "./book";
 
 interface IBid {
-  book: string;
+  bookId: BookDoc;
   bidder: string;
   status: ExchangeStatus;
+  bidderBook: BookDoc;
+  comment: string | undefined;
 }
 
 export interface BidDoc extends mongoose.Document {
-  book: string;
+  bookId: BookDoc;
   bidder: string;
   status: ExchangeStatus;
+  bidderBook: BookDoc;
+  comment: string | undefined;
 }
 
 interface BidModel extends mongoose.Model<BidDoc> {
@@ -19,16 +25,25 @@ interface BidModel extends mongoose.Model<BidDoc> {
 
 const bidSchema = new mongoose.Schema(
   {
-    book: {
-      type: String,
+    bookId: {
+      type: mongoose.Schema.Types.ObjectId,
       required: true,
+      ref: "Book",
     },
     bidder: {
       type: String,
       required: true,
     },
+    bidderBook: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Book",
+      required: true,
+    },
+    comment: {
+      type: String,
+    },
     status: {
-      type: ExchangeStatus,
+      type: String,
       enum: Object.values(ExchangeStatus),
       default: ExchangeStatus.PENDING,
     },
@@ -43,8 +58,16 @@ const bidSchema = new mongoose.Schema(
   }
 );
 
+bidSchema.set("versionKey", "version");
+bidSchema.plugin(updateIfCurrentPlugin);
+
 bidSchema.statics.build = (attrs: BidDoc) => {
-  return new Bid(attrs);
+  return new Bid({
+    bookId: attrs.bookId,
+    bidder: attrs.bidder,
+    bidderBook: attrs.bidderBook,
+    comment: attrs.comment,
+  });
 };
 
 export const Bid = mongoose.model<BidDoc, BidModel>("Bid", bidSchema);

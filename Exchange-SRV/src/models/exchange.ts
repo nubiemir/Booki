@@ -1,18 +1,14 @@
-import mongoose from "mongoose";
-import { BidDoc } from "./bid";
+import mongoose, { ObjectId } from "mongoose";
+import { updateIfCurrentPlugin } from "mongoose-update-if-current";
 
 interface IExchange {
   book: string;
-  bids: BidDoc[];
-  approvedBid: BidDoc;
-  rejectedBids: BidDoc[];
+  bids: ObjectId[];
 }
 
 export interface ExchangeDoc extends mongoose.Document {
   book: string;
-  bids: BidDoc[];
-  approvedBid: BidDoc;
-  rejectedBids: BidDoc[];
+  bids: ObjectId[];
 }
 
 interface ExchangeModel extends mongoose.Model<ExchangeDoc> {
@@ -41,6 +37,9 @@ const exchangeSchema = new mongoose.Schema(
     },
   }
 );
+
+exchangeSchema.set("versionKey", "version");
+exchangeSchema.plugin(updateIfCurrentPlugin);
 
 exchangeSchema.statics.build = (attrs: IExchange) => {
   return new Exchange(attrs);

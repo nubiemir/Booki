@@ -4,11 +4,11 @@ import {
   NotFoundError,
   errorHandler,
   currentUserMiddleware,
-} from "@hthub/common";
+} from "@booki/common";
 import cookieSession from "cookie-session";
 import { newComment } from "./routes/index";
 import { replay } from "./routes/replyComment";
-import { bookComments } from "./routes/bookComment";
+// import { bookComments } from "../../archive/bookComment";
 import { likeComment } from "./routes/likeComment";
 import { likeReply } from "./routes/likeReply";
 const app = express();
@@ -22,7 +22,7 @@ app.use(
   })
 );
 app.use(currentUserMiddleware);
-app.use(bookComments);
+// app.use(bookComments);
 app.use(newComment);
 app.use(replay);
 app.use(likeComment);

@@ -4,9 +4,9 @@ import {
   NotFoundError,
   errorHandler,
   currentUserMiddleware,
-} from "@hthub/common";
+} from "@booki/common";
 import cookieSession from "cookie-session";
-
+import { newBid, approve, cancel, getBids } from "./routes/app";
 const app = express();
 
 app.set("proxy", true);
@@ -18,6 +18,10 @@ app.use(
   })
 );
 app.use(currentUserMiddleware);
+app.use(newBid);
+app.use(getBids);
+app.use(approve);
+app.use(cancel);
 
 // 404 error
 app.use("*", (req, res) => {

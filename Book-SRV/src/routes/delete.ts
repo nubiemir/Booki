@@ -1,5 +1,5 @@
-import { BadRequestError, isAuth, NotAuthorizedError } from "@hthub/common";
-import express, { Request, Response } from "express";
+import { BadRequestError, isAuth, NotAuthorizedError } from "@booki/common";
+import express, { NextFunction, Request, Response } from "express";
 import { Book } from "../models/book";
 
 const router = express.Router();
@@ -7,14 +7,19 @@ const router = express.Router();
 router.delete(
   "/api/booki/:bookId",
   isAuth,
-  async (req: Request, res: Response) => {
-    const { bookId } = req.params;
-    const book = await Book.findById(bookId).populate("ownerId");
-    if (!book) throw new BadRequestError("Sorry book not found");
-    if (book.ownerId.id !== req.currentUser!.id) throw new NotAuthorizedError();
-    book.show = false;
-    await book.save();
-    res.send("deleted");
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { bookId } = req.params;
+      const book = await Book.findByIdAndDelete(bookId).populate("ownerId");
+      if (!book) throw new BadRequestError("Sorry book not found");
+      if (book.ownerId.toString() !== req.currentUser!.id)
+        throw new NotAuthorizedError();
+
+      await book.save();
+      res.send(book);
+    } catch (error) {
+      return next(error);
+    }
   }
 );
 

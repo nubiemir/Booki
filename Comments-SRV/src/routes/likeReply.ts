@@ -1,37 +1,41 @@
-import { BadRequestError, isAuth, validateRequest } from "@hthub/common";
-import express, { Request, Response } from "express";
+import { BadRequestError, isAuth, validateRequest } from "@booki/common";
+import express, { NextFunction, Request, Response } from "express";
 import { body } from "express-validator";
-import { Comment } from "../models/comment";
+import { ReplyUpdatedPublisher } from "../events/publisher/replyUpdatedPublisher";
+import { Reply } from "../models/reply";
+import { nats } from "../NatsWrapper";
 
 const router = express.Router();
 
 router.put(
   "/api/comments/likeReply",
-  [body("replyId").not().isEmpty().withMessage("No reply given")],
+  [
+    body("replyId").not().isEmpty().withMessage("No reply given"),
+    body("commentId").not().isEmpty().withMessage("No Comment given"),
+  ],
   validateRequest,
   isAuth,
-  async (req: Request, res: Response) => {
-    const { replyId, commentId } = req.body;
-    console.log(replyId);
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { replyId, commentId } = req.body;
 
-    // const reply = await Reply.findById(replyId);
-    const comment = await Comment.findOne({
-      _id: commentId,
-      "reply._id": replyId,
-    });
+      const reply = await Reply.findById(replyId);
+      if (!reply) throw new BadRequestError("No reply found");
+      ++reply.likes;
 
-    if (!comment) throw new BadRequestError("No comment found");
-    comment.reply.map((rep) => {
-      if (rep.id === replyId) {
-        return rep.likes++;
-      }
-      return rep;
-    });
+      await reply.save();
 
-    await comment.save();
-    // await reply.save();
-
-    res.send(comment);
+      new ReplyUpdatedPublisher(nats.client).publish({
+        id: reply.id,
+        userId: reply.userId,
+        text: reply.text,
+        likes: reply.likes,
+        commentId: commentId,
+      });
+      res.send(reply);
+    } catch (error) {
+      return next(error);
+    }
   }
 );
 

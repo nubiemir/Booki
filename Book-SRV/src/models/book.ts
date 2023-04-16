@@ -1,5 +1,5 @@
-import mongoose from "mongoose";
-import { UserDoc } from "../models/user";
+import mongoose, { ObjectId } from "mongoose";
+import { updateIfCurrentPlugin } from "mongoose-update-if-current";
 
 /**
  * Books schema
@@ -23,8 +23,8 @@ interface IBook {
   genre: string;
   coverImageUrl: string;
   publishedDate: Date;
-  ownerId: UserDoc;
-  show: boolean;
+  ownerId: ObjectId;
+  condition: string[];
 }
 
 /**
@@ -39,8 +39,8 @@ export interface BookDoc extends mongoose.Document {
   genre: string;
   coverImageUrl: string;
   publishedDate: Date;
-  ownerId: UserDoc;
-  show: boolean;
+  ownerId: ObjectId;
+  condition: string;
 }
 
 interface BookModel extends mongoose.Model<BookDoc> {
@@ -75,13 +75,11 @@ const BookSchema = new mongoose.Schema(
     },
     ownerId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
       required: true,
     },
-    show: {
-      type: mongoose.Schema.Types.Boolean,
+    condition: {
+      type: String,
       required: true,
-      default: true,
     },
   },
   {
@@ -93,6 +91,9 @@ const BookSchema = new mongoose.Schema(
     },
   }
 );
+
+BookSchema.set("versionKey", "version");
+BookSchema.plugin(updateIfCurrentPlugin);
 
 BookSchema.statics.build = (attrs: IBook) => {
   return new Book(attrs);

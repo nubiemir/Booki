@@ -3,7 +3,7 @@ import {
   isAuth,
   NotAuthorizedError,
   validateRequest,
-} from "@hthub/common";
+} from "@booki/common";
 import express, { NextFunction, Request, Response } from "express";
 import { body } from "express-validator";
 import { Book } from "../models/book";
@@ -17,6 +17,10 @@ router.put(
     body("author").not().isEmpty().withMessage("Author is required"),
     body("description").not().isEmpty().withMessage("Description is required"),
     body("genre").not().isEmpty().withMessage("Genre is required"),
+    body("condition")
+      .not()
+      .isEmpty()
+      .withMessage("The condition of the book needs to be stated"),
     body("publishedDate")
       .not()
       .isEmpty()
@@ -27,12 +31,13 @@ router.put(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { bookId } = req.params;
-      const book = await Book.findById(bookId).populate("ownerId");
+      const book = await Book.findById(bookId);
       if (!book) throw new BadRequestError("Sorry book not found");
-      if (book.ownerId.id !== req.currentUser!.id)
+      if (book.ownerId.toString() !== req.currentUser!.id)
         throw new NotAuthorizedError();
-      const { title, author, description, genre, publishedDate } = req.body;
-      book.set({ title, author, description, genre, publishedDate });
+      const { title, author, description, genre, publishedDate, condition } =
+        req.body;
+      book.set({ title, author, description, genre, publishedDate, condition });
       await book.save();
       res.send(book);
     } catch (err) {

@@ -1,6 +1,6 @@
 import express, { Request, Response, NextFunction } from "express";
 import { body } from "express-validator";
-import { validateRequest } from "@hthub/common";
+import { validateRequest } from "@booki/common";
 import { User } from "../model/user";
 import { randomInt } from "node:crypto";
 import { Token } from "../model/token";
@@ -28,7 +28,7 @@ router.post(
 
       // send email (token)
 
-      res.status(201).json({});
+      res.status(201).json(token);
     } catch (error) {
       next(error);
     }
