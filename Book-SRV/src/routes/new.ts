@@ -8,12 +8,14 @@ import {
 } from "../events/publisher/bookCreatedPublisher";
 import { Book } from "../models/book";
 import { nats } from "../NatsWrapper";
+import { cloudinaryConfig, multerUploads } from "../utils/config";
 
 const router = express.Router();
 
 router.post(
   "/api/booki/new-book",
   isAuth,
+  multerUploads,
   [
     body("title").not().isEmpty().withMessage("Title is required"),
     body("author").not().isEmpty().withMessage("Author is required"),
@@ -32,17 +34,33 @@ router.post(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const id = req.currentUser!.id;
-      const { title, author, description, genre, publishedDate, condition } =
+      let { title, author, description, genre, publishedDate, condition } =
         req.body;
+      const file = req.file;
+      let result =
+        "https://res.cloudinary.com/doo1ivw33/image/upload/v1682083010/Booki/books/default_book_cover_2015_rtxonx.jpg";
+
+      if (file) {
+        const v2 = cloudinaryConfig();
+        const encodedData = file.buffer.toString("base64");
+        const finalData = `data:${file.mimetype};base64,${encodedData}`;
+        const { secure_url } = await v2.uploader.upload(finalData, {
+          folder: "Booki/books",
+        });
+
+        result = secure_url;
+      }
+      genre = JSON.parse(genre);
+
       const book = new Book({
         title,
-
         author,
         description,
         genre,
         publishedDate,
         ownerId: id,
         condition,
+        coverImageUrl: result,
       });
 
       await book.save();

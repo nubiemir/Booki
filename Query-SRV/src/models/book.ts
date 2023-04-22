@@ -21,7 +21,7 @@ interface IBook {
   title: string;
   author: string;
   description: string;
-  genre: string;
+  genre: string[];
   coverImageUrl: string;
   publishedDate: Date;
   ownerId: ObjectId;
@@ -39,7 +39,7 @@ export interface BookDoc extends mongoose.Document {
   title: string;
   author: string;
   description: string;
-  genre: string;
+  genre: string[];
   coverImageUrl: string;
   publishedDate: Date;
   ownerId: ObjectId;
@@ -66,10 +66,12 @@ const BookSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    genre: {
-      type: String,
-      required: true,
-    },
+    genre: [
+      {
+        type: String,
+        required: true,
+      },
+    ],
     coverImageUrl: {
       type: String,
       default: "test",

@@ -13,7 +13,7 @@ export interface QBook {
     title: string;
     author: string;
     description: string;
-    genre: string;
+    genre: string[];
     coverImage: string;
     publishedDate: Date;
     ownerId: ObjectId;
@@ -29,7 +29,7 @@ export interface EBook {
     title: string;
     author: string;
     description: string;
-    genre: string;
+    genre: string[];
     coverImage: string;
     publishedDate: Date;
     ownerId: ObjectId;

@@ -6,7 +6,6 @@ export interface User {
   data: {
     email: string;
     uname: string;
-    interests: string[];
     id: ObjectId;
   };
 }
