@@ -23,3 +23,5 @@ export * from "./events/ICommentCreated";
 export * from "./events/IReplyCreated";
 export * from "./events/IReplyUpdated";
 export * from "./events/ICommentUpdated";
+export * from "./events/IBookUpdated";
+//////

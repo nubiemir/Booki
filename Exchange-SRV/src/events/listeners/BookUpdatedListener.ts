@@ -1,26 +1,33 @@
-import { IBookCreatedListener, Listener, Subjects } from "@booki/common";
+import {
+  BadRequestError,
+  IBookUpdatedListener,
+  Listener,
+  Subjects,
+} from "@booki/common";
 import { Book } from "@booki/common/build/events/IBook";
 import { Msg } from "nats";
 import { Book as BookModel } from "../../models/book";
 import { streamConfig } from "./consumerOptions";
 
-export class BookCreatedListener extends Listener<IBookCreatedListener> {
-  subject: Subjects.SBOOKCREATED = Subjects.SBOOKCREATED;
-  deliverSubject = Subjects.SBOOKCREATED;
-  filterSubject = Subjects.PBOOKCREATED;
-  durableName = streamConfig.BCreatedDurableName;
+export class BookUpdatedListener extends Listener<IBookUpdatedListener> {
+  subject: Subjects.SBOOKUPDATED = Subjects.SBOOKUPDATED;
+  deliverSubject = Subjects.SBOOKUPDATED;
+  filterSubject = Subjects.PBOOKUPDATED;
+  durableName = streamConfig.BUpdatedDurableName;
   streamName = streamConfig.StreamName;
-  queueGroupName = streamConfig.BCreatedQueueName;
+  queueGroupName = streamConfig.BUpdatedQueueName;
   async onMessage(data: Book["data"], msg: Msg) {
-    const book = BookModel.build({
-      id: data.id,
+    const book = await BookModel.findById(data.id);
+    if (!book)
+      throw new BadRequestError("Book not found in QBookUpdatedListener");
+    book.set({
       title: data.title,
       author: data.author,
       description: data.description,
       genre: data.genre,
       coverImageUrl: data.coverImage,
       publishedDate: data.publishedDate,
-      ownerId: data.ownerId,
+      ownerId: book.ownerId,
       condition: data.condition,
       likes: data.likes,
       cloudinaryPublicId: data.cloudinaryPublicId,

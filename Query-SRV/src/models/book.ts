@@ -28,6 +28,8 @@ interface IBook {
   condition: string;
   comments: ObjectId[];
   id: ObjectId;
+  likes: string[];
+  cloudinaryPublicId: string | undefined;
 }
 
 /**
@@ -46,6 +48,8 @@ export interface BookDoc extends mongoose.Document {
   condition: string;
   comments: ObjectId[];
   id: ObjectId;
+  likes: string[];
+  cloudinaryPublicId: string | undefined;
 }
 
 interface BookModel extends mongoose.Model<BookDoc> {
@@ -95,6 +99,14 @@ const BookSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    likes: [
+      {
+        type: String,
+      },
+    ],
+    cloudinaryPublicId: {
+      type: String,
+    },
   },
   {
     toJSON: {
@@ -121,6 +133,8 @@ BookSchema.statics.build = (attrs: IBook) => {
     ownerId: attrs.ownerId,
     comments: attrs.comments,
     condition: attrs.condition,
+    likes: attrs.likes,
+    cloudinaryPublicId: attrs.cloudinaryPublicId,
   });
 };
 
