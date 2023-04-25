@@ -109,6 +109,10 @@ const BookSchema = new mongoose.Schema(
     },
   },
   {
+    timestamps: {
+      updatedAt: false,
+      createdAt: true,
+    },
     toJSON: {
       transform(doc, ret) {
         ret.id = ret._id;
