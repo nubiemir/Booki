@@ -29,6 +29,7 @@ router.put(
       const newReply = Reply.build({
         text: text,
         userId: req.currentUser!.id.toString(),
+        likes: [],
       });
 
       comment.reply = [...comment.reply, newReply];
@@ -40,7 +41,7 @@ router.put(
         userId: newReply.userId,
         text: newReply.text,
         commentId: comment.id,
-        likes: 0,
+        likes: [],
       });
       res.send(newReply);
     } catch (error) {

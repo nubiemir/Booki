@@ -29,7 +29,7 @@ router.post(
         userId: req.currentUser!.id,
         text: text,
         reply: [],
-        likes: 0,
+        likes: [],
       });
 
       await comment.save();

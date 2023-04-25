@@ -7,7 +7,7 @@ export interface Replay {
     id: ObjectId;
     userId: string;
     text: string;
-    likes: number;
+    likes: string[];
     commentId: string;
   };
 }

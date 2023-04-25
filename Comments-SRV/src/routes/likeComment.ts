@@ -17,13 +17,25 @@ router.put(
       const { commentId } = req.body;
       const comment = await Comment.findById(commentId);
       if (!comment) throw new BadRequestError("Comment not found");
-      comment.likes++;
+
+      const userExists: string | undefined = comment.likes.find(
+        (id) => id === req.currentUser!.id
+      );
+
+      if (!userExists) {
+        console.log("====> here");
+        comment.likes.push(req.currentUser!.id);
+      } else {
+        comment.likes = comment.likes.filter(
+          (id) => id !== req.currentUser!.id
+        );
+      }
       await comment.save();
       new CommentUpdatedPublisher(nats.client).publish({
         id: comment.id,
         text: comment.text,
         bookId: comment.bookId,
-        likes: comment.likes++,
+        likes: comment.likes,
         userId: comment.userId,
       });
       res.send(comment);

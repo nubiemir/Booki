@@ -7,7 +7,7 @@ export interface Comment {
     id: ObjectId;
     text: string;
     bookId: string;
-    likes: number;
+    likes: string[];
     userId: string;
   };
 }
