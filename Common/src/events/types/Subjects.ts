@@ -21,4 +21,6 @@ export enum Subjects {
   SQBOOKUPDATED = "qbook.updated",
   PCBOOKUPDATED = "events.cbook.updated",
   SCBOOKUPDATED = "cbook.updated",
+  PEUSERCREATED = "events.euser.created",
+  SEUSERCREATED = "euser.created",
 }

@@ -4,7 +4,10 @@ import jsonwebtoken from "jsonwebtoken";
 import { validateRequest, BadRequestError } from "@booki/common";
 import { User } from "../model/user";
 import { randomInt } from "node:crypto";
-import { UserCreatedPublisher } from "../events/publishers/userCreated";
+import {
+  ExUserCreatedPublisher,
+  UserCreatedPublisher,
+} from "../events/publishers/userCreated";
 import { nats } from "../NatsWrapper";
 
 const router = express.Router();
@@ -83,10 +86,14 @@ router.post(
         process.env.JWT_KEY!
       );
       req.session = { jwt: jwtToken };
-      await new UserCreatedPublisher(nats.client).publish({
+      new UserCreatedPublisher(nats.client).publish({
         email: newUser.email,
         uname: newUser.userName,
-        interests,
+        id: newUser._id,
+      });
+      new ExUserCreatedPublisher(nats.client).publish({
+        email: newUser.email,
+        uname: newUser.userName,
         id: newUser._id,
       });
       res.status(201).json(newUser);

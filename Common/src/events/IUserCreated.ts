@@ -8,3 +8,11 @@ export interface IUserCreatedPublisher extends User {
 export interface IUserCreatedListener extends User {
   subject: Subjects.SUSERCREATED;
 }
+
+export interface EUserCreatedPublisher extends User {
+  subject: Subjects.PEUSERCREATED;
+}
+
+export interface EUserCreatedListener extends User {
+  subject: Subjects.SEUSERCREATED;
+}
